@@ -729,6 +729,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(help_text, parse_mode='Markdown', reply_markup=reply_markup)
 
 def main():
+    # Створюємо додаток
     application = Application.builder().token(TOKEN).build()
     
     # Команди
@@ -744,12 +745,13 @@ def main():
     # Важливо: він має бути вище за MessageHandler з текстом
     application.add_handler(MessageHandler(filters.PHOTO, handle_screenshot))
     
-    # Обробка тексту
+    # Обробка тексту (шифрування, розшифрування та адмін-розсилка)
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
     logger.info("🚀 Roblox Boss Challenge Bot запущен!")
-      application.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
-
+    
+    # Запуск бота (відступ має бути рівно 4 пробіли від краю def)
+    application.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
 
 if __name__ == '__main__':
     main()
