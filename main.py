@@ -547,7 +547,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except:
                 await update.message.reply_text("❌ Неверный формат! Используй: ID количество", reply_markup=reply_markup)
             
-                        context.user_data['admin_mode'] = None
+            context.user_data['admin_mode'] = None
         
         elif admin_mode == 'broadcast':
             data = load_data()
@@ -593,6 +593,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Используй кнопки меню или команду /start 😊",
             reply_markup=reply_markup
         )
+
 
 async def top_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = load_data()
