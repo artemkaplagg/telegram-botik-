@@ -347,8 +347,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         context.user_data['mode'] = 'decrypt'
     
-    elif query.data ==
- 'help':
+    elif query.data == 'help':
         help_text = """ℹ️ *ПОЛНАЯ ИНСТРУКЦИЯ*
 
 🎯 *Дать задание*
