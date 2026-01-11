@@ -509,6 +509,35 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         context.user_data['admin_mode'] = 'broadcast'
 
+async def handle_screenshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Перевіряємо, чи ми чекаємо скриншот
+    if not context.user_data.get('waiting_screenshot'):
+        return
+
+    user_id = str(update.effective_user.id)
+    data = load_data()
+
+    if user_id in data["users"]:
+        # Нараховуємо 50 коїнів
+        data["users"][user_id]["coins"] += 50
+        data["users"][user_id]["challenges_done"] += 1
+        data["users"][user_id]["last_challenge"] = None
+        save_data(data)
+        
+        # Вимикаємо режим очікування
+        context.user_data['waiting_screenshot'] = False
+
+        keyboard = [[InlineKeyboardButton("🏠 Главное меню", callback_data='menu')]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+        await update.message.reply_text(
+            "✅ *ЗАДАНИЕ ВЫПОЛНЕНО!*\n\n📸 Скриншот получен. Тебе начислено *50 Роблокс-коинов*! 💎\n\nПродолжай в том же духе!",
+            parse_mode='Markdown',
+            reply_markup=reply_markup
+        )
+    else:
+        await update.message.reply_text("❌ Ошибка: сначала нажми /start")
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mode = context.user_data.get('mode')
     admin_mode = context.user_data.get('admin_mode')
@@ -702,13 +731,20 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     application = Application.builder().token(TOKEN).build()
     
+    # Команди
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("top", top_command))
     application.add_handler(CommandHandler("stats", stats_command))
     application.add_handler(CommandHandler("help", help_command))
     
+    # Обробка кнопок
     application.add_handler(CallbackQueryHandler(button_callback))
     
+    # --- НОВИЙ ОБРОБНИК ФОТО ---
+    # Важливо: він має бути вище за MessageHandler з текстом
+    application.add_handler(MessageHandler(filters.PHOTO, handle_screenshot))
+    
+    # Обробка тексту
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
     logger.info("🚀 Roblox Boss Challenge Bot запущен!")
@@ -716,4 +752,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
