@@ -556,23 +556,25 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 except:
                     failed += 1
             
-            await update.message.reply_text(
-                f"✅ Рассылка завершена!\n\n✅ Успешно: {success}\n❌ Ошибок: {failed}",
-                reply_markup=reply_markup
-            )
-            context.user_data['admin_mode'] = None
-        
-        return
-    
-     if mode == 'encrypt':
+                    # Це кінець блоку розсилки адміна
+        await update.message.reply_text(
+            f"✅ Рассылка завершена!\n\n✅ Успешно: {success}\n❌ Ошибок: {failed}",
+            reply_markup=reply_markup
+        )
+        context.user_data['admin_mode'] = None
+        return # Цей return виходить з функції, якщо спрацювала розсилка
+
+    # --- ПЕРЕВІР ЦЕЙ ВІДСТУП НИЖЧЕ ---
+    if mode == 'encrypt':
         encrypted = encrypt_message(update.message.text)
         
-        # Отправляем зашифрованный текст цитатой для быстрого копирования
+        # Відправляємо зашифрований текст
         await update.message.reply_text(
-            f"🔐 *ЗАШИФРОВАНО:*\n\nОтправь это друзьям! Они смогут расшифровать через бота 😎",
+            f"🔐 *ЗАШИФРОВАНО:*\n\n`{encrypted}`\n\nОтправь это друзьям! Они смогут расшифровать через бота 😎",
             parse_mode='Markdown',
             reply_markup=reply_markup
         )
+
         
         # Отправляем зашифрованный текст отдельным сообщением для копирования
         await update.message.reply_text(
