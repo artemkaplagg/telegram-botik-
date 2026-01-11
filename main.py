@@ -276,17 +276,11 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     
     elif query.data == 'complete_challenge':
-        update_user_coins(query.from_user.id, 50)
-        user_data = get_user_data(query.from_user.id)
-        
-        keyboard = [[InlineKeyboardButton("🏠 Главное меню", callback_data='menu')]]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        
         await query.edit_message_text(
-            f"🎉 *ПОЗДРАВЛЯЮ!*\n\n✅ Задание выполнено!\n💰 +50 коинов!\n\n📊 Твои коины: {user_data['coins']}\n🏆 Выполнено заданий: {user_data['challenges_done']}",
-            parse_mode='Markdown',
-            reply_markup=reply_markup
+            "📸 *ПОДТВЕРЖДЕНИЕ ЗАДАНИЯ*\n\n⚠️ Для получения коинов нужно подтвердить выполнение!\n\n📷 Отправь скриншот из игры, где видно что ты выполнил задание!\n\n💡 Просто скинь любое фото из Роблокса",
+            parse_mode='Markdown'
         )
+        context.user_data['waiting_screenshot'] = True
     
     elif query.data == 'random_game':
         game = random.choice(ROBLOX_GAMES)
@@ -353,7 +347,8 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         context.user_data['mode'] = 'decrypt'
     
-    elif query.data == 'help':
+    elif query.data ==
+ 'help':
         help_text = """ℹ️ *ПОЛНАЯ ИНСТРУКЦИЯ*
 
 🎯 *Дать задание*
@@ -570,14 +565,24 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         return
     
-    if mode == 'encrypt':
+     if mode == 'encrypt':
         encrypted = encrypt_message(update.message.text)
+        
+        # Отправляем зашифрованный текст цитатой для быстрого копирования
         await update.message.reply_text(
-            f"🔐 *ЗАШИФРОВАНО:*\n\n{encrypted}\n\nОтправь это друзьям! Они смогут расшифровать через бота 😎",
+            f"🔐 *ЗАШИФРОВАНО:*\n\nОтправь это друзьям! Они смогут расшифровать через бота 😎",
             parse_mode='Markdown',
             reply_markup=reply_markup
         )
+        
+        # Отправляем зашифрованный текст отдельным сообщением для копирования
+        await update.message.reply_text(
+            encrypted,
+            reply_to_message_id=update.message.message_id
+        )
+        
         context.user_data['mode'] = None
+
     
     elif mode == 'decrypt':
         decrypted = decrypt_message(update.message.text)
